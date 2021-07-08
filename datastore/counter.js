@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
+const {promises: {readFile, writeFile}} = require('fs');
 
 var counter = 0;
 
@@ -16,25 +17,31 @@ const zeroPaddedNumber = (num) => {
 };
 
 const readCounter = (callback) => {
-  fs.readFile(exports.counterFile, (err, fileData) => {
+  readFile(exports.counterFile, 'utf8').then(fileData => {
+    callback(null, Number(fileData));
+  }).catch(e => callback(null, 0));
+};
+/*fs.readFile(exports.counterFile, (err, fileData) => {
     if (err) {
       callback(null, 0);
     } else {
       callback(null, Number(fileData));
     }
-  });
-};
+  });*/
 
 const writeCounter = (count, callback) => {
   var counterString = zeroPaddedNumber(count);
-  fs.writeFile(exports.counterFile, counterString, (err) => {
-    if (err) {
-      throw ('error writing counter');
-    } else {
-      callback(null, counterString);
-    }
-  });
+  writeFile(exports.counterFile, counterString).then(() => {
+    callback(null, counterString);
+  }).catch(e => callback(e));
 };
+/*fs.writeFile(exports.counterFile, counterString, (err) => {
+  if (err) {
+    throw ('error writing counter');
+  } else {
+    callback(null, counterString);
+  }
+});*/
 
 // Public API - Fix this function //////////////////////////////////////////////
 
